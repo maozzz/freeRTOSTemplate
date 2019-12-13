@@ -74,6 +74,8 @@ file(GLOB_RECURSE SOURCES
         #        emdr1986x-std-per-lib/MDR32F9Qx_StdPeriph_Driver/src/MDR32F9Qx_uart.c
         #        emdr1986x-std-per-lib/MDR32F9Qx_StdPeriph_Driver/src/MDR32F9Qx_usb.c
         #        emdr1986x-std-per-lib/MDR32F9Qx_StdPeriph_Driver/src/MDR32F9Qx_wwdg.c
+
+        rtos/*.c
         )
 
 include_directories(
@@ -86,7 +88,10 @@ include_directories(
         emdr1986x-std-per-lib/CMSIS/CM3/DeviceSupport/MDR32F9Qx/startup
         emdr1986x-std-per-lib/CMSIS/CM3/DeviceSupport/MDR32F9Qx/startup/gcc
         emdr1986x-std-per-lib/MDR32F9Qx_StdPeriph_Driver/inc
-        emdr1986x-std-per-lib/MDR32F9Qx_StdPeriph_Driver/inc/USB_Library)
+        emdr1986x-std-per-lib/MDR32F9Qx_StdPeriph_Driver/inc/USB_Library
+
+        rtos/include
+)
 
 add_executable(${PROJECT_NAME}.elf ${SOURCES})
 

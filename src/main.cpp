@@ -1,20 +1,44 @@
+#include <FreeRTOS.h>
+#include <FreeRTOSConfig.h>
+#include <task.h>
+#include <MDR32F9Qx_port.h>
+#include <MDR32F9Qx_rst_clk.h>
 #include <Pin.h>
-#include "MDR32F9Qx_port.h"
-#include "MDR32F9Qx_rst_clk.h"
 
 void initClk();
 void initLed();
-void delay(uint32_t delay);
 
 Pin *led;
+Pin *led2;
+void task(void *arg);
+void task2(void *arg);
 
 int main() {
     initClk();
     initLed();
 
+    xTaskCreate(task, "1", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(task2, "2", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+
+    // Запускаем диспетчер и понеслась.
+    vTaskStartScheduler();
+
+    while (true) {
+        asm("nop");
+    }
+}
+
+void task(void *arg) {
     while (true) {
         led->toggle();
-        delay(1000000);
+        vTaskDelay(1000);
+    }
+}
+
+void task2(void *arg) {
+    while (true) {
+        led2->toggle();
+        vTaskDelay(2000);
     }
 }
 
@@ -44,10 +68,8 @@ void initClk(void) {
 void initLed() {
     led = new Pin(MDR_PORTC, PORT_Pin_0);
     led->init()->oe(PORT_OE_OUT)->speed(PORT_SPEED_MAXFAST)->mode(PORT_MODE_DIGITAL);
-}
-
-void delay(uint32_t delay) {
-    for (int i = 0; i < delay; ++i);
+    led2 = new Pin(MDR_PORTC, PORT_Pin_1);
+    led2->init()->oe(PORT_OE_OUT)->speed(PORT_SPEED_MAXFAST)->mode(PORT_MODE_DIGITAL);
 }
 
 #ifdef __cplusplus
