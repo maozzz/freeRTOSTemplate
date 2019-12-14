@@ -5,6 +5,12 @@
 #ifndef R1_PINOUT_H
 #define R1_PINOUT_H
 
+typedef enum {
+    PIN_PULL_NONE = 0x0,
+    PIN_PULL_UP = 0x1,
+    PIN_PULL_DOWN = 0x2
+} PIN_PULL_MODE;
+
 #include <MDR32F9Qx_config.h>
 #include <MDR32F9Qx_port.h>
 #include <MDR32F9Qx_rst_clk.h>
@@ -15,7 +21,7 @@ public:
     Pin(MDR_PORT_TypeDef *port, uint32_t pin);
 
     Pin(MDR_PORT_TypeDef *port, uint32_t pin, PORT_OE_TypeDef oe, PORT_SPEED_TypeDef speed, PORT_MODE_TypeDef mode,
-        PORT_FUNC_TypeDef func, bool pullUp, bool pullDown);
+        PORT_FUNC_TypeDef func, PIN_PULL_MODE pullMode);
 
     Pin *switchOn();
 
@@ -33,11 +39,9 @@ public:
 
     Pin *func(PORT_FUNC_TypeDef func);
 
-    Pin *pullUp(bool b);
-
-    Pin *pullDown(bool b);
-
     Pin *init();
+
+    Pin *pull(PIN_PULL_MODE mode);
 
 private:
     PORT_InitTypeDef initStruct;

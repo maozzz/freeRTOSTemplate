@@ -2,13 +2,11 @@
 // Created by Алексей on 03.09.2018.
 //
 
-#include <MDR32F9Qx_port.h>
-#include "Pin.h"
+#include "main.h"
 
 
 Pin::Pin(MDR_PORT_TypeDef *port, uint32_t pin, PORT_OE_TypeDef _oe, PORT_SPEED_TypeDef _speed, PORT_MODE_TypeDef _mode,
-         PORT_FUNC_TypeDef _func,
-         bool pullUp, bool pullDown) {
+         PORT_FUNC_TypeDef _func, PIN_PULL_MODE pullMode) {
     assert_param(IS_PORT_PIN(pin));
     this->port = port;
     this->pin = pin;
@@ -19,6 +17,7 @@ Pin::Pin(MDR_PORT_TypeDef *port, uint32_t pin, PORT_OE_TypeDef _oe, PORT_SPEED_T
     oe(_oe);
     speed(_speed);
     mode(_mode);
+    pull(pullMode);
     init();
 }
 
@@ -39,6 +38,7 @@ Pin *Pin::oe(PORT_OE_TypeDef oe) {
 Pin *Pin::speed(PORT_SPEED_TypeDef speed) {
     uint32_t tempPwr = port->PWR;
 
+    vTaskDelay(10);
     tempPwr &= ~(3 * pin * pin);
     if (speed & 0x1) tempPwr |= pin * pin;
     if (speed & 0x2) tempPwr |= pin * pin * 2;
@@ -61,18 +61,21 @@ Pin *Pin::mode(PORT_MODE_TypeDef mode) {
     return this;
 }
 
+Pin *Pin::pull(PIN_PULL_MODE mode) {
+    if (mode == PIN_PULL_DOWN) {
+        port->PULL &= ~(pin << 16);
+        port->PULL |= pin;
+    } else if (mode == PIN_PULL_UP) {
+        port->PULL &= ~pin;
+        port->PULL |= pin << 16;
+    } else {
+        port->PULL &= ~pin;
+        port->PULL &= ~(pin << 16);
+    }
+}
+
 bool Pin::read() {
     return (port->RXTX & pin) > 0;
-}
-
-Pin *Pin::pullUp(bool b) {
-    initStruct.PORT_PULL_UP = b ? PORT_PULL_UP_ON : PORT_PULL_UP_OFF;
-    return this;
-}
-
-Pin *Pin::pullDown(bool b) {
-    initStruct.PORT_PULL_DOWN = b ? PORT_PULL_DOWN_ON : PORT_PULL_DOWN_OFF;
-    return this;
 }
 
 Pin *Pin::init() {

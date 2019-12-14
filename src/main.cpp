@@ -1,24 +1,20 @@
-#include <FreeRTOS.h>
-#include <FreeRTOSConfig.h>
-#include <task.h>
-#include <MDR32F9Qx_port.h>
-#include <MDR32F9Qx_rst_clk.h>
-#include <Pin.h>
+#include "main.h"
 
 void initClk();
 void initLed();
+void initGlcd();
 
 Pin *led;
-Pin *led2;
+LcdKs0108 *glcd;
 void task(void *arg);
 void task2(void *arg);
+void task3(void *arg);
 
 int main() {
     initClk();
-    initLed();
 
-    xTaskCreate(task, "1", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(task2, "2", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+//    xTaskCreate(task, "1", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(task3, "3", 300, NULL, tskIDLE_PRIORITY + 1, NULL);
 
     // Запускаем диспетчер и понеслась.
     vTaskStartScheduler();
@@ -29,17 +25,50 @@ int main() {
 }
 
 void task(void *arg) {
+    initLed();
     while (true) {
         led->toggle();
         vTaskDelay(1000);
     }
 }
 
-void task2(void *arg) {
-    while (true) {
-        led2->toggle();
-        vTaskDelay(2000);
-    }
+void task3(void *arg) {
+    initGlcd();
+    glcd->test2();
+}
+
+void initGlcd() {
+    glcd = new LcdKs0108();
+    glcd->init(
+            new Pin(MDR_PORTA, PORT_Pin_0, PORT_OE_OUT, PORT_SPEED_MAXFAST, PORT_MODE_DIGITAL, PORT_FUNC_PORT,
+                    PIN_PULL_DOWN),
+            new Pin(MDR_PORTA, PORT_Pin_1, PORT_OE_OUT, PORT_SPEED_MAXFAST, PORT_MODE_DIGITAL, PORT_FUNC_PORT,
+                    PIN_PULL_DOWN),
+            new Pin(MDR_PORTA, PORT_Pin_2, PORT_OE_OUT, PORT_SPEED_MAXFAST, PORT_MODE_DIGITAL, PORT_FUNC_PORT,
+                    PIN_PULL_DOWN),
+            new Pin(MDR_PORTA, PORT_Pin_3, PORT_OE_OUT, PORT_SPEED_MAXFAST, PORT_MODE_DIGITAL, PORT_FUNC_PORT,
+                    PIN_PULL_DOWN),
+            new Pin(MDR_PORTA, PORT_Pin_4, PORT_OE_OUT, PORT_SPEED_MAXFAST, PORT_MODE_DIGITAL, PORT_FUNC_PORT,
+                    PIN_PULL_DOWN),
+            new Pin(MDR_PORTA, PORT_Pin_5, PORT_OE_OUT, PORT_SPEED_MAXFAST, PORT_MODE_DIGITAL, PORT_FUNC_PORT,
+                    PIN_PULL_DOWN),
+            new Pin(MDR_PORTF, PORT_Pin_2, PORT_OE_OUT, PORT_SPEED_MAXFAST, PORT_MODE_DIGITAL, PORT_FUNC_PORT,
+                    PIN_PULL_DOWN),
+            new Pin(MDR_PORTF, PORT_Pin_3, PORT_OE_OUT, PORT_SPEED_MAXFAST, PORT_MODE_DIGITAL, PORT_FUNC_PORT,
+                    PIN_PULL_DOWN),
+            new Pin(MDR_PORTB, PORT_Pin_7, PORT_OE_OUT, PORT_SPEED_MAXFAST, PORT_MODE_DIGITAL, PORT_FUNC_PORT,
+                    PIN_PULL_DOWN),
+            new Pin(MDR_PORTB, PORT_Pin_8, PORT_OE_OUT, PORT_SPEED_MAXFAST, PORT_MODE_DIGITAL, PORT_FUNC_PORT,
+                    PIN_PULL_DOWN),
+            new Pin(MDR_PORTB, PORT_Pin_9, PORT_OE_OUT, PORT_SPEED_MAXFAST, PORT_MODE_DIGITAL, PORT_FUNC_PORT,
+                    PIN_PULL_DOWN),
+            new Pin(MDR_PORTB, PORT_Pin_10, PORT_OE_OUT, PORT_SPEED_MAXFAST, PORT_MODE_DIGITAL, PORT_FUNC_PORT,
+                    PIN_PULL_DOWN),
+            new Pin(MDR_PORTC, PORT_Pin_0, PORT_OE_OUT, PORT_SPEED_MAXFAST, PORT_MODE_DIGITAL, PORT_FUNC_PORT,
+                    PIN_PULL_DOWN),
+            new Pin(MDR_PORTC, PORT_Pin_1, PORT_OE_OUT, PORT_SPEED_MAXFAST, PORT_MODE_DIGITAL, PORT_FUNC_PORT,
+                    PIN_PULL_DOWN)
+    );
 }
 
 void initClk(void) {
@@ -68,8 +97,6 @@ void initClk(void) {
 void initLed() {
     led = new Pin(MDR_PORTC, PORT_Pin_0);
     led->init()->oe(PORT_OE_OUT)->speed(PORT_SPEED_MAXFAST)->mode(PORT_MODE_DIGITAL);
-    led2 = new Pin(MDR_PORTC, PORT_Pin_1);
-    led2->init()->oe(PORT_OE_OUT)->speed(PORT_SPEED_MAXFAST)->mode(PORT_MODE_DIGITAL);
 }
 
 #ifdef __cplusplus
