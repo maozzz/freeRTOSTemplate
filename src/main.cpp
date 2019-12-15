@@ -1,20 +1,26 @@
+#include <MDR32F9Qx_StdPeriph_Driver/inc/MDR32F9Qx_uart.h>
 #include "main.h"
 
 void initClk();
 void initLed();
 void initGlcd();
 
+// UART
+void PortsInit();
+void UARTInit();
+
+
 Pin *led;
 LcdKs0108 *glcd;
-void task(void *arg);
-void task2(void *arg);
-void task3(void *arg);
+void uartTask(void *arg);
+void glcdTask(void *arg);
 
 int main() {
     initClk();
 
 //    xTaskCreate(task, "1", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(task3, "3", 300, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(Uart::task, "uart", 32, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(glcdTask, "3", 300, NULL, tskIDLE_PRIORITY + 1, NULL);
 
     // Запускаем диспетчер и понеслась.
     vTaskStartScheduler();
@@ -24,18 +30,11 @@ int main() {
     }
 }
 
-void task(void *arg) {
-    initLed();
-    while (true) {
-        led->toggle();
-        vTaskDelay(1000);
-    }
-}
-
-void task3(void *arg) {
+void glcdTask(void *arg) {
     initGlcd();
     glcd->test2();
 }
+
 
 void initGlcd() {
     glcd = new LcdKs0108();
@@ -94,14 +93,10 @@ void initClk(void) {
     SystemCoreClockUpdate();
 }
 
-void initLed() {
-    led = new Pin(MDR_PORTC, PORT_Pin_0);
-    led->init()->oe(PORT_OE_OUT)->speed(PORT_SPEED_MAXFAST)->mode(PORT_MODE_DIGITAL);
-}
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 #ifdef __cplusplus
 } // extern "C" block end
 #endif

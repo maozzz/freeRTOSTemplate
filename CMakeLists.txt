@@ -71,7 +71,7 @@ file(GLOB_RECURSE SOURCES
         #        emdr1986x-std-per-lib/MDR32F9Qx_StdPeriph_Driver/src/MDR32F9Qx_sdio.c
         #        emdr1986x-std-per-lib/MDR32F9Qx_StdPeriph_Driver/src/MDR32F9Qx_ssp.c
         #        emdr1986x-std-per-lib/MDR32F9Qx_StdPeriph_Driver/src/MDR32F9Qx_timer.c
-        #        emdr1986x-std-per-lib/MDR32F9Qx_StdPeriph_Driver/src/MDR32F9Qx_uart.c
+                emdr1986x-std-per-lib/MDR32F9Qx_StdPeriph_Driver/src/MDR32F9Qx_uart.c
         #        emdr1986x-std-per-lib/MDR32F9Qx_StdPeriph_Driver/src/MDR32F9Qx_usb.c
         #        emdr1986x-std-per-lib/MDR32F9Qx_StdPeriph_Driver/src/MDR32F9Qx_wwdg.c
 
